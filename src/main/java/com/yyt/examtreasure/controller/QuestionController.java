@@ -1,7 +1,11 @@
 package com.yyt.examtreasure.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yyt.examtreasure.annotation.AuthCheck;
 import com.yyt.examtreasure.common.BaseResponse;
@@ -16,8 +20,10 @@ import com.yyt.examtreasure.model.dto.question.QuestionEditRequest;
 import com.yyt.examtreasure.model.dto.question.QuestionQueryRequest;
 import com.yyt.examtreasure.model.dto.question.QuestionUpdateRequest;
 import com.yyt.examtreasure.model.entity.Question;
+import com.yyt.examtreasure.model.entity.QuestionBankQuestion;
 import com.yyt.examtreasure.model.entity.User;
 import com.yyt.examtreasure.model.vo.QuestionVO;
+import com.yyt.examtreasure.service.QuestionBankQuestionService;
 import com.yyt.examtreasure.service.QuestionService;
 import com.yyt.examtreasure.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +47,7 @@ public class QuestionController {
     @Resource
     private QuestionService questionService;
 
+
     @Resource
     private UserService userService;
 
@@ -54,6 +61,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionAddRequest == null, ErrorCode.PARAMS_ERROR);
         // todo 在此处将实体类和 DTO 进行转换
@@ -84,6 +92,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestion(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -159,11 +168,8 @@ public class QuestionController {
     @PostMapping("/list/page")
     @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
-        long current = questionQueryRequest.getCurrent();
-        long size = questionQueryRequest.getPageSize();
-        // 查询数据库
-        Page<Question> questionPage = questionService.page(new Page<>(current, size),
-                questionService.getQueryWrapper(questionQueryRequest));
+        ThrowUtils.throwIf(questionQueryRequest == null,ErrorCode.PARAMS_ERROR);
+        Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
         return ResultUtils.success(questionPage);
     }
 
@@ -221,6 +227,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/edit")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
         if (questionEditRequest == null || questionEditRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

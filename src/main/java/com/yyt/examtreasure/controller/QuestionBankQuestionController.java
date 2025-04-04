@@ -1,6 +1,8 @@
 package com.yyt.examtreasure.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yyt.examtreasure.annotation.AuthCheck;
 import com.yyt.examtreasure.common.BaseResponse;
@@ -10,8 +12,10 @@ import com.yyt.examtreasure.common.ResultUtils;
 import com.yyt.examtreasure.constant.UserConstant;
 import com.yyt.examtreasure.exception.BusinessException;
 import com.yyt.examtreasure.exception.ThrowUtils;
+import com.yyt.examtreasure.model.dto.questionBank.QuestionBankQueryRequest;
 import com.yyt.examtreasure.model.dto.questionBankQuestion.QuestionBankQuestionAddRequest;
 import com.yyt.examtreasure.model.dto.questionBankQuestion.QuestionBankQuestionQueryRequest;
+import com.yyt.examtreasure.model.dto.questionBankQuestion.QuestionBankQuestionRemoveRequest;
 import com.yyt.examtreasure.model.dto.questionBankQuestion.QuestionBankQuestionUpdateRequest;
 import com.yyt.examtreasure.model.entity.QuestionBankQuestion;
 import com.yyt.examtreasure.model.entity.User;
@@ -51,6 +55,7 @@ public class QuestionBankQuestionController {
      * @return
      */
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBankQuestion(@RequestBody QuestionBankQuestionAddRequest questionBankQuestionAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionBankQuestionAddRequest == null, ErrorCode.PARAMS_ERROR);
         // todo 在此处将实体类和 DTO 进行转换
@@ -77,6 +82,7 @@ public class QuestionBankQuestionController {
      * @return
      */
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestionBankQuestion(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -203,6 +209,26 @@ public class QuestionBankQuestionController {
     }
 
 
+
+    /**
+     * 删除题库题目关系
+     *
+     * @param questionBankQuestionRemoveRequest
+     * @return
+     */
+    @PostMapping("/remove")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> removeQuestionBankQuestion(@RequestBody QuestionBankQuestionRemoveRequest questionBankQuestionRemoveRequest) {
+
+        ThrowUtils.throwIf(questionBankQuestionRemoveRequest == null, ErrorCode.PARAMS_ERROR);
+        Long questionBankId = questionBankQuestionRemoveRequest.getQuestionBankId();
+        Long questionId = questionBankQuestionRemoveRequest.getQuestionId();
+        LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                .eq(QuestionBankQuestion::getQuestionBankId, questionBankId)
+                .eq(QuestionBankQuestion::getQuestionId, questionId);
+        boolean result = questionBankQuestionService.remove(lambdaQueryWrapper);
+        return ResultUtils.success(result);
+    }
 
     // endregion
 }
