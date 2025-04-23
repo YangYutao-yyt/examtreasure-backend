@@ -6,6 +6,7 @@ import com.yyt.examtreasure.model.dto.user.UserQueryRequest;
 import com.yyt.examtreasure.model.entity.User;
 import com.yyt.examtreasure.model.vo.LoginUserVO;
 import com.yyt.examtreasure.model.vo.UserVO;
+
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -116,4 +117,20 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
+
+    /**
+     * 添加用户签到记录
+     * @param userId 用户id
+     * @return 当前用户是否已签到成功
+     */
+    boolean addUserSignIn(long userId);
+
+    /**
+     * 获取用户某个年份的签到记录
+     *
+     * @param userId 用户id
+     * @param year   年份
+     * @return 签到记录映射
+     */
+    List<Integer> getUserSignInRecord(long userId, Integer year);
 }
