@@ -1,5 +1,6 @@
 package com.yyt.examtreasure.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yyt.examtreasure.annotation.AuthCheck;
 import com.yyt.examtreasure.common.BaseResponse;
@@ -10,6 +11,7 @@ import com.yyt.examtreasure.config.WxOpenConfig;
 import com.yyt.examtreasure.constant.UserConstant;
 import com.yyt.examtreasure.exception.BusinessException;
 import com.yyt.examtreasure.exception.ThrowUtils;
+import com.yyt.examtreasure.model.dto.questionBankQuestion.QuestionBankQuestionBatchAddRequest;
 import com.yyt.examtreasure.model.dto.user.UserAddRequest;
 import com.yyt.examtreasure.model.dto.user.UserLoginRequest;
 import com.yyt.examtreasure.model.dto.user.UserQueryRequest;
@@ -351,5 +353,8 @@ public class UserController {
         List<Integer> userSignInRecord = userService.getUserSignInRecord(loginUser.getId(), year);
         return  ResultUtils.success(userSignInRecord);
     }
+
+
+
 
 }
