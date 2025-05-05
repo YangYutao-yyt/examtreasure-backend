@@ -1,0 +1,8 @@
+[{"count":2312.0,
+  "grade":0,
+  "limitApp":"default",
+  "minRequestAmount":5,
+  "resource":"listQuestionVOByPage",
+  "slowRatioThreshold":0.9,
+  "statIntervalMs":1000,
+  "timeWindow":12312}]
